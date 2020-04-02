@@ -1,8 +1,9 @@
 'use strict';
 
-var config;
+//var config;
 const fs = require('fs');
 const path = require('path');
+const confManager = require('./configManager');
 /**
  * 
  * @param {String} data 
@@ -103,37 +104,25 @@ function parser(data, issueNum) {
 	return res;
 }
 
-fs.readFile("config.json", function (fatal, conf) {
-	if (fatal) {
-		console.error(new Error("config.json is not found or invalid"));
-		return;
-	}
-	config = JSON.parse(conf);
-	let res = [];
-	for (let i in config.files) {
-		let readFile = path.normalize(config.files[i]);
-		let [, issueNum] = config.files[i].match(/issue-(\d+)/);
-		let data = fs.readFileSync(readFile);
-		/* if (err) {
-			console.error(new Error(readFile + "is not found or invalid"));
-		} */
-		res = res.concat(parser(data.toString('UTF-8'), parseInt(issueNum)));
-		//console.log('***' + JSON.stringify(res));
-	}
-
-	let resFile = path.join(config.output || 'result.json');
-	fs.writeFile(resFile, JSON.stringify(res, undefined, 4), function (err) {
-		if (err) {
-			console.error(new Error(resFile + " cannot be wrote"));
-		} else {
-			console.log(resFile + ' has been modified');
-		}
-	});
-});
-
-function filesEmulator() {
-	let files = [];
-	for (let i = 1; i <= 100; i++) {
-		files.push("/home/jingkaimori/E/Source/gitproject/weekly/docs/issue-" + i + ".md");
-	}
+confManager.readConfig();
+let res = [];
+// console.log('***' + JSON.stringify(confManager.config));
+for (let i in confManager.config.files) {
+	let readFile = path.normalize(path.join(confManager.config.weeklyResponsitry,confManager.config.files[i]));
+	let [, issueNum] = confManager.config.files[i].match(/issue-(\d+)/);
+	let data = fs.readFileSync(readFile);
+	/* if (err) {
+		console.error(new Error(readFile + "is not found or invalid"));
+	} */
+	res = res.concat(parser(data.toString('UTF-8'), parseInt(issueNum)));
+	
 }
+
+let resFile = path.join(confManager.config.output || 'result.json');
+fs.writeFile(resFile, JSON.stringify(res, undefined, 4), function (err) {
+	if (err) {
+		console.error(new Error(resFile + " cannot be wrote"));
+	} else {
+		console.log(resFile + ' has been modified');
+	}
+});
