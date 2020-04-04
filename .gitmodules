@@ -1,0 +1,3 @@
+[submodule "weekly"]
+	path = weekly
+	url = git@github.com:ruanyf/weekly
