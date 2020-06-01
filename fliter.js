@@ -1,12 +1,19 @@
-'use strict';
-
-//var config;
-const fs = require('fs');
-const path = require('path');
-const confManager = require('./configManager');
+"use strict";
 /**
- * 
- * @param {String} data 
+ * 根据配置文件读取期刊文件，将期刊拆分为条目，输出至result.json文件。
+ * 已经迁移至deno。
+ * 运行时报错：
+ * ```error: No such file or directory (os error 2)```
+ * 等待新版本deno
+ */
+import {readFileStr} from "https://deno.land/std/fs/read_file_str.ts";
+import {writeJson} from "https://deno.land/std/fs/write_json.ts";
+import {join} from "https://deno.land/std/path/mod.ts";
+//var config;
+import {readConfig,config} from "./configManager.js";
+/**
+ * 将期刊拆分为条目。
+ * @param {String} data 期刊的markdown格式文本
  * @returns {object}
  */
 function parser(data, issueNum) {
@@ -103,26 +110,38 @@ function parser(data, issueNum) {
 	}
 	return res;
 }
+try{
+	readConfig();
 
-confManager.readConfig();
+
 let res = [];
-// console.log('***' + JSON.stringify(confManager.config));
-for (let i in confManager.config.files) {
-	let readFile = path.normalize(path.join(confManager.config.weeklyResponsitry,confManager.config.files[i]));
-	let [, issueNum] = confManager.config.files[i].match(/issue-(\d+)/);
-	let data = fs.readFileSync(readFile);
-	/* if (err) {
-		console.error(new Error(readFile + "is not found or invalid"));
-	} */
-	res = res.concat(parser(data.toString('UTF-8'), parseInt(issueNum)));
-	
+// console.log('***' + JSON.stringify(config));
+for (let i in config.files) {
+
+		let srcFile = join(config.weeklyResponsitry,config.files[i]);
+		let [, issueNum] = config.files[i].match(/issue-(\d+)/);
+		
+		readFileStr(srcFile).then(
+			(data)=>{
+				res = res.concat(parser(data, parseInt(issueNum)));
+			},
+			(err)=>{
+				console.error(new Error(err + "is not found or invalid"));
+			}
+		);
 }
 
-let resFile = path.join(confManager.config.output || 'result.json');
-fs.writeFile(resFile, JSON.stringify(res, undefined, 4), function (err) {
-	if (err) {
-		console.error(new Error(resFile + " cannot be wrote"));
-	} else {
+let resFile = join(config.output || 'result.json');
+
+writeJson(resFile, res,  {spaces:4})
+.then(
+	()=>{
 		console.log(resFile + ' has been modified');
-	}
-});
+	},
+	(err)=>{
+		console.error(new Error(resFile + " cannot be wrote"));
+	} 
+);
+}catch(e){
+	console.log("Error!");
+}
