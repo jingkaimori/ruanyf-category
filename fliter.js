@@ -3,12 +3,16 @@
  * 根据配置文件读取期刊文件，将期刊拆分为条目，输出至result.json文件。
  * 已经迁移至deno。
  * 运行时报错：
- * ```error: No such file or directory (os error 2)```
- * 等待新版本deno
+ * 	error: Uncaught AssertionError: Unexpected skip of the emit.
+ * 		at Object.assert ($deno$/util.ts:33:11)
+ * 		at compile ($deno$/compiler.ts:1170:7)
+ * 		at tsCompilerOnMessage ($deno$/compiler.ts:1338:22)
+ * 		at workerMessageRecvCallback ($deno$/runtime_worker.ts:72:33)
+ * 		at file:///mnt/E/Source/web(Html+CSS+JavaScript)/deno-test/__anonymous__:1:1
  */
-import {readFileStr} from "https://deno.land/std/fs/read_file_str.ts";
-import {writeJson} from "https://deno.land/std/fs/write_json.ts";
-import {join} from "https://deno.land/std/path/mod.ts";
+import {readFileStr} from "https://deno.land/x/std/fs/read_file_str.ts";
+import {writeJson} from "https://deno.land/x/std/fs/write_json.ts";
+import {join} from "https://deno.land/x/std/path/mod.ts";
 //var config;
 import {readConfig,config} from "./configManager.js";
 /**
@@ -110,6 +114,7 @@ function parser(data, issueNum) {
 	}
 	return res;
 }
+console.log("Launched!");
 try{
 	readConfig();
 

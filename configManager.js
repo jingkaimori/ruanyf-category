@@ -7,8 +7,8 @@
  * 等待新版本deno
  */
 var config={};
-import {readJson,join} from "https://deno.land/std/path/mod.ts";
-import {writeJson} from "https://deno.land/std/fs/write_json.ts";
+import {readJson,join} from "https://deno.land/x/std/path/mod.ts";
+import {writeJson} from "https://deno.land/x/std/fs/write_json.ts";
 
 function updateConfig() {
 	config.files = [];
