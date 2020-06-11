@@ -2,19 +2,17 @@
 /**
  * 读取、修改配置文件。配置文件config.json映射到config对象。
  * 已经迁移至deno。
- * 运行时报错：
- * ```error: No such file or directory (os error 2)```
- * 等待新版本deno
+ * deno的1.1版本已经修复了外部依赖错误。
  */
-var config={};
-import {readJson,join} from "https://deno.land/x/std/path/mod.ts";
-import {writeJson} from "https://deno.land/x/std/fs/write_json.ts";
+var config={
+	
+};
+import {readJson,writeJson} from "https://deno.land/x/std/fs/mod.ts";
+//import {join} from "../deno/std/path/mod.ts";
 
+/** 该函数不再生成文件名。 */
 function updateConfig() {
-	config.files = [];
-	for (let i = 1; i <= 100; i++) {
-		config.files.push(join(config.weeklyResponsitry,"docs/issue-" + i + ".md"));
-	}
+	
 	writeJson('config.json', config,  {spaces:4}).then(
 		()=>{
 			console.log('config.json  has been modified');
@@ -25,21 +23,25 @@ function updateConfig() {
 	);
 }
 function readConfig(){
-	readJson("./config.json").then(
-		(data)=>{
-			config =data;
-			console.log(data);
-		},(error) =>{
-			console.log("error1");
-			if(typeof error== SyntaxError) {
-				console.error("config.json is invalid"+error);
-			}else{
-				console.error(error);
+	return new Promise(function(resolve,reject){
+		readJson("./config.json").then(
+			(data)=>{
+				config =data;
+				//console.log(data);
+				resolve();
+			},
+			(error) =>{
+				console.log("error occured!");
+				if(typeof error== SyntaxError) {
+					console.error("config.json is invalid"+error);
+				}else{
+					console.error(error);
+				}
+				reject(error);
 			}
-			throw error;
-		}
-	);
+		);
+	});
+	
 }
 
 export {readConfig,updateConfig,config};
-//exports.config=config;

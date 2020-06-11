@@ -2,16 +2,10 @@
 /**
  * 根据配置文件读取期刊文件，将期刊拆分为条目，输出至result.json文件。
  * 已经迁移至deno。
- * 运行时报错：
- * 	error: Uncaught AssertionError: Unexpected skip of the emit.
- * 		at Object.assert ($deno$/util.ts:33:11)
- * 		at compile ($deno$/compiler.ts:1170:7)
- * 		at tsCompilerOnMessage ($deno$/compiler.ts:1338:22)
- * 		at workerMessageRecvCallback ($deno$/runtime_worker.ts:72:33)
- * 		at file:///mnt/E/Source/web(Html+CSS+JavaScript)/deno-test/__anonymous__:1:1
+ * 
+ * deno的1.1版本修复了无法使用远程ts模块的bug。
  */
-import {readFileStr} from "https://deno.land/x/std/fs/read_file_str.ts";
-import {writeJson} from "https://deno.land/x/std/fs/write_json.ts";
+import {readFileStrSync,writeJson,walk} from "https://deno.land/x/std/fs/mod.ts";
 import {join} from "https://deno.land/x/std/path/mod.ts";
 //var config;
 import {readConfig,config} from "./configManager.js";
@@ -45,6 +39,7 @@ function parser(data, issueNum) {
 	 */
 	function findMetadata(str, regex, func) {
 		return str.replace(regex, function () {
+			//截取参数列表第一项以后的部分。
 			var args = Array.prototype.slice.call(arguments, 1);
 			func.apply(this, args);
 			return '';
@@ -114,39 +109,42 @@ function parser(data, issueNum) {
 	}
 	return res;
 }
-console.log("Launched!");
-try{
-	readConfig();
+readConfig().then(
+	async ()=>{
+		console.log("Config!");
+		let res = [];
+		// console.log('***' + JSON.stringify(config));
 
+		/** 
+		 * 使用walk函数来遍历目录，检索期刊文章。 
+		 * 读完所有文件后写入result.json
+		 */
+		for await (const entry  of walk(config.weeklyResponsitry,{match:[/issue-(\d+)/]})){
+			try{
+				console.log("ping!");
 
-let res = [];
-// console.log('***' + JSON.stringify(config));
-for (let i in config.files) {
-
-		let srcFile = join(config.weeklyResponsitry,config.files[i]);
-		let [, issueNum] = config.files[i].match(/issue-(\d+)/);
-		
-		readFileStr(srcFile).then(
-			(data)=>{
-				res = res.concat(parser(data, parseInt(issueNum)));
-			},
-			(err)=>{
+				let [, issueNum] = entry.path.match(/issue-(\d+)/);
+				let data=readFileStrSync(entry.path);
+				let pRes=parser(data, parseInt(issueNum));
+				
+				res = res.concat(pRes);
+			}catch (err){
 				console.error(new Error(err + "is not found or invalid"));
 			}
-		);
-}
-
-let resFile = join(config.output || 'result.json');
-
-writeJson(resFile, res,  {spaces:4})
-.then(
+		}
+		let resFile = join(config.output || 'result.json');
+		console.log( "modifying " + resFile);
+		return writeJson(resFile, res,  {spaces:4});
+	}
+).then(
 	()=>{
-		console.log(resFile + ' has been modified');
+		console.log( "resFile has been modified");
 	},
 	(err)=>{
-		console.error(new Error(resFile + " cannot be wrote"));
+		console.log("resFile cannot be wrote");
+	} 
+).catch(
+	(err)=>{
+		console.log("Error!\n\t"+err);
 	} 
 );
-}catch(e){
-	console.log("Error!");
-}
