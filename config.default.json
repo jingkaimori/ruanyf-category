@@ -1,0 +1,64 @@
+{
+	"weeklyResponsitry": "weekly/docs/",
+	"debug":true,
+	"rules": [
+		{
+			"match": "（(@.*\\[|.*\\[@)(.*)\\]\\(([^)]+)\\)[^)]*投稿）$",
+			"type": "attribute",
+			"attribute": {
+				"2": "recommender",
+				"3": "issue"
+			},
+			"remove": true,
+			"title": false
+		},
+		{
+			"match": "^\\[([^\\]]*)\\]\\((.*)\\)(（(.*)）)?",
+			"type": "attribute",
+			"attribute": {
+				"1": "title",
+				"2": "reference",
+				"4": "lang"
+			},
+			"remove": true,
+			"title": true
+		},
+		{
+			"match": "^([^)\\]]+)(（(.*)）)$",
+			"type": "attribute",
+			"attribute": {
+				"1": "title",
+				"3": "lang"
+			},
+			"remove": true,
+			"title": true
+		},
+		{
+			"match": "^-- *\\[(.*)\\]\\((.*)\\)$",
+			"type": "attribute",
+			"attribute": {
+				"1": "recommender",
+				"2": "issue"
+				
+			},
+			"remove": true,
+			"title": false
+		},
+		{
+			"match": "^-- *(.+)$",
+			"type": "attribute",
+			"attribute": {
+				"1": "reference"
+			},
+			"remove": false,
+			"title": false
+		},
+		{
+			"match": "!\\[.*\\]\\((.*)\\)",
+			"type": "list",
+			"list": "images",
+			"remove": true,
+			"title": false
+		}
+	]
+}

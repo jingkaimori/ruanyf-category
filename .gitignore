@@ -1,4 +1,7 @@
 .jshintrc
+.vscode
+*.swp
+
 result.json
 config.json
-.vscode
+latest.log
