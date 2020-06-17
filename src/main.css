@@ -1,0 +1,25 @@
+header{
+	height: 2.2em;
+
+}
+
+.header-button{
+	display: block;
+	text-decoration: none;
+	width: 6em;
+	height: 2em;
+	text-align: center;
+	float: left;
+}
+
+.content{
+ 	display: flex;
+	flex-direction: row; 
+	align-content: center;
+}
+main{
+	flex-grow: 1;
+	flex: 900px;
+	
+	width: 900px;
+}

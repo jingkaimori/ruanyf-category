@@ -1,6 +1,6 @@
 {
 	"weeklyResponsitry": "weekly/docs/",
-	"debug":true,
+	"debug":false,
 	"rules": [
 		{
 			"match": "（(@.*\\[|.*\\[@)(.*)\\]\\(([^)]+)\\)[^)]*投稿）$",
@@ -29,6 +29,15 @@
 			"attribute": {
 				"1": "title",
 				"3": "lang"
+			},
+			"remove": true,
+			"title": true
+		},
+		{
+			"match": "^([^(\\[]*)$",
+			"type": "attribute",
+			"attribute": {
+				"1": "title"
 			},
 			"remove": true,
 			"title": true

@@ -18,30 +18,27 @@ function updateConfig() {
 			console.log('config.json  has been modified');
 		},
 		(err) => {
-			console.error(new Error("config.json cannot be wrote"));
+			err.message += "\nconfig.json cannot be wrote";
+			console.error(err);
 		} 
 	);
 }
 function readConfig(){
-	return new Promise(function(resolve,reject){
-		readJson("./config.json").then(
-			(data)=>{
-				config =data;
-				//console.log(data);
-				resolve();
-			},
-			(error) =>{
-				console.log("error occured!");
-				if(typeof error== SyntaxError) {
-					console.error("config.json is invalid"+error);
-				}else{
-					console.error(error);
-				}
-				reject(error);
+	return readJson("./config.json").then(
+		(data)=>{
+			config =data;
+			//console.log(data);
+		},
+		(error) =>{
+			console.log("error occured!");
+			if(typeof error== SyntaxError) {
+				console.error("config.json is invalid\n"+error);
+			}else{
+				console.error(error);
 			}
-		);
-	});
-	
+			return error;
+		}
+	);
 }
 
 export {readConfig,updateConfig,config};
