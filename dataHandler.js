@@ -7,17 +7,15 @@
  * 
  * deno的1.1版本修复了无法使用远程ts模块的bug。
  */
-import { readFileStrSync, writeJson, walk } from "https://deno.land/x/std/fs/mod.ts";
+import { readFileStr,readJson, writeJson, walk } from "https://deno.land/x/std/fs/mod.ts";
 import { join } from "https://deno.land/x/std/path/mod.ts";
 import { readConfig, config } from "./configManager.js";
+import {logFileWriteError,logFileReadError,debugOutput} from "./utility.js";
 
-function debugOutput(mesg) {
-	if(config.debug){
-		console.log(mesg);
-	}
-}
+export var structure={};
+
 /**
- * 将期刊拆分为条目。
+ * 将给定的期刊文本拆分为条目。
  * @param {String} data 期刊的markdown格式文本
  * @returns {object}
  */
@@ -96,46 +94,55 @@ function parser(data, issueNum) {
 	}
 	return res;
 }
-
-async function readLocalIssues() {
-	console.log("Started!");
+/**
+ * 遍历处理本地所有期刊，更新全局对象。
+ * @returns {Promise} 
+ */
+export async function updateFromLocalIssues() {
+	debugOutput("Started!");
 	let res = [];
-	// console.log('***' + JSON.stringify(config));
+	//debugOutput('***' + JSON.stringify(config));
 
 	/** 
 	 * 使用walk函数来遍历目录，检索期刊文章。 
 	 * 读完所有文件后写入result.json
 	 */
 	for await (const entry of walk(config.weeklyResponsitry, { match: [/issue-(\d+)/] })) {
-		try {
-			//console.log("ping!");
-
-			let [, issueNum] = entry.path.match(/issue-(\d+)/);
-			let data = readFileStrSync(entry.path);
+		readLocalIssue().catch( logFileWriteError );
+	}
+	return writeStructure();
+}
+/**
+ * 从给定的文件路径读取并处理本地期刊。
+ * @param {String} path 期刊的文件路径
+ */
+export async function readLocalIssue(path) {
+	//debugOutput("ping!");
+	let [, issueNum] = path.match(/issue-(\d+)/);
+	return readFileStr(path).then(
+		(data)=>{
 			let pRes = parser(data, parseInt(issueNum));
 
-			res = res.concat(pRes);
-		} catch (err) {
-			if (typeof err == SyntaxError) {
-				console.error(new Error(err + "is not found or invalid"));
-			} else {
-				console.error(err);
-			}
+			structure = structure.concat(pRes);
 		}
-	}
-	let resFile = join(config.output || 'result.json');
-	debugOutput("modifying " + resFile);
-	return writeJson(resFile, res, { spaces: 4 }).then(
+	).catch( logFileWriteError );
+	
+}
+export function writeStructure(){
+	let file = join(config.output || 'result.json');
+	debugOutput("modifying " + file);
+	return writeJson(file, structure, { spaces: 4 }).then(
 		() => {
 			debugOutput("resFile has been modified");
-		},
-		(err) => {
-			console.log("resFile cannot be wrote");
 		}
-	).catch(
-		(err) => {
-			console.log("Error!\n\t" + err);
-		}
-	);
+	).catch( logFileWriteError );
 }
-export {readLocalIssues};
+export function readStructure(){
+	let file = join(config.output || 'result.json');
+	debugOutput("reading " + file);
+	return readJson(file).then(
+		(data)=>{
+			structure = data;
+		}
+	).catch( logFileReadError );
+}

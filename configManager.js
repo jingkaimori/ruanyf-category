@@ -8,19 +8,16 @@ var config={
 	
 };
 import {readJson,writeJson} from "https://deno.land/x/std/fs/mod.ts";
+import {logFileWriteError,logFileReadError} from "./utility.js";
 //import {join} from "../deno/std/path/mod.ts";
 
 /** 该函数不再生成文件名。 */
 function updateConfig() {
-	
-	writeJson('config.json', config,  {spaces:4}).then(
+	return writeJson('config.json', config,  {spaces:4}).then(
 		()=>{
 			console.log('config.json  has been modified');
 		},
-		(err) => {
-			err.message += "\nconfig.json cannot be wrote";
-			console.error(err);
-		} 
+		logFileWriteError
 	);
 }
 function readConfig(){
@@ -29,7 +26,7 @@ function readConfig(){
 			config =data;
 			//console.log(data);
 		},
-		(error) =>{
+		logFileReadError/* (error) =>{
 			console.log("error occured!");
 			if(typeof error== SyntaxError) {
 				console.error("config.json is invalid\n"+error);
@@ -37,7 +34,7 @@ function readConfig(){
 				console.error(error);
 			}
 			return error;
-		}
+		} */
 	);
 }
 

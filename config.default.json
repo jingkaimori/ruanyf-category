@@ -1,6 +1,8 @@
 {
 	"weeklyResponsitry": "weekly/docs/",
 	"debug":false,
+	"errPage":"",
+	"static":true,
 	"rules": [
 		{
 			"match": "（(@.*\\[|.*\\[@)(.*)\\]\\(([^)]+)\\)[^)]*投稿）$",
