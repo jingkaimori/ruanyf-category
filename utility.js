@@ -11,6 +11,7 @@ import { config } from "./configManager.js";
  */
 export function logGeneralError(err){
 	console.error(err);
+	return Promise.reject(err);
 }
 /**
  * 捕获读文件时产生的错误，用作promise的异常回调函数
@@ -22,6 +23,7 @@ export function logFileReadError(err){
 		err.message = "File not found or cannot be read";
 	}
 	console.error(err);
+	return Promise.reject(err);
 }
 /**
  * 捕获写文件时产生的错误，用作promise的异常回调函数
@@ -33,6 +35,7 @@ export function logFileWriteError(err){
 		err.message = "File not found or cannot be wrote";
 	}
 	console.error(err);
+	return Promise.reject(err);
 }
 export function debugOutput(mesg) {
 	if(config.debug){

@@ -1,8 +1,12 @@
 {
 	"weeklyResponsitry": "weekly/docs/",
-	"debug":false,
+	"debug":true,
 	"errPage":"",
 	"static":true,
+	"mineType":{
+		"js":"text/javascript",
+		"css":"text/css"
+	},
 	"rules": [
 		{
 			"match": "（(@.*\\[|.*\\[@)(.*)\\]\\(([^)]+)\\)[^)]*投稿）$",

@@ -26,15 +26,7 @@ function readConfig(){
 			config =data;
 			//console.log(data);
 		},
-		logFileReadError/* (error) =>{
-			console.log("error occured!");
-			if(typeof error== SyntaxError) {
-				console.error("config.json is invalid\n"+error);
-			}else{
-				console.error(error);
-			}
-			return error;
-		} */
+		logFileReadError
 	);
 }
 

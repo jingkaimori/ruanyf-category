@@ -12,7 +12,7 @@ import { join } from "https://deno.land/x/std/path/mod.ts";
 import { readConfig, config } from "./configManager.js";
 import {logFileWriteError,logFileReadError,debugOutput} from "./utility.js";
 
-export var structure={};
+export var structure=[];
 
 /**
  * 将给定的期刊文本拆分为条目。
@@ -103,13 +103,15 @@ export async function updateFromLocalIssues() {
 	let res = [];
 	//debugOutput('***' + JSON.stringify(config));
 
-	/** 
-	 * 使用walk函数来遍历目录，检索期刊文章。 
-	 * 读完所有文件后写入result.json
-	 */
+	/* 使用walk函数来遍历目录，检索期刊文章。
+	 * 此处使用数组来收集所有的回调函数，并使用Promise来检查所有的异步操作是否都完成。
+	 */ 
+	let work=[];
 	for await (const entry of walk(config.weeklyResponsitry, { match: [/issue-(\d+)/] })) {
-		readLocalIssue().catch( logFileWriteError );
+		work.push(readLocalIssue(entry.path).catch( logFileWriteError ));
 	}
+	await Promise.allSettled(work);
+	//读完所有文件后保存数据结构
 	return writeStructure();
 }
 /**
@@ -128,6 +130,9 @@ export async function readLocalIssue(path) {
 	).catch( logFileWriteError );
 	
 }
+/** 
+ * 将条目结构写入config.output指定的文件名（默认为result.json）
+ */
 export function writeStructure(){
 	let file = join(config.output || 'result.json');
 	debugOutput("modifying " + file);
