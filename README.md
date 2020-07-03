@@ -3,6 +3,15 @@
 
 本项目迁移至deno。
 
+## 如何运行
+
+本项目依赖deno，deno的安装方法在[此处](https://github.com/denoland/deno-install)
+
+安装完成后，执行以下命令即可运行：
+```bash
+deno run --allow-read --allow-write --allow-net --unstable localServer.js
+```
+
 ## 目前实现的功能
 - 将博客中的各个词条重构为JSON格式
 - 提取元数据

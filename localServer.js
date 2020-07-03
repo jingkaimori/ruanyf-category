@@ -55,7 +55,6 @@ function dynamicRespond(req) {
 				}
 				/** @var {Response} res */
 				let res = {
-					method: "POST",
 					body: itemContent,
 					headers : new Headers({
 						"Content-Type": "application/json;charset=utf-8"
@@ -85,12 +84,14 @@ function staticRespond(req) {
 	).then(
 		(file) => {
 			let type = (config.mineType[req.url.match(/\.([^.]*)$/)[1]] || "text") + "; charset=utf-8";
-			//设定返回文档的MIME类型
-			let resHeaders = new Headers({
-				"Content-Type": type
-			});
-			/** @var {Response} fileRes */
-			let fileRes = { body: file, headers: resHeaders };
+			/** 设定返回文档的MIME类型
+			 * @var {Response} fileRes */
+			let fileRes = { 
+				body: file, 
+				headers: new Headers({
+					"Content-Type": type
+				})
+			};
 
 			return req.respond(fileRes);
 		}
