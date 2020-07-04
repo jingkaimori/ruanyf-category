@@ -83,19 +83,12 @@ function staticRespond(req) {
 		}
 	).then(
 		(file) => {
-			let type = (config.mineType[req.url.match(/\.([^.]*)$/)[1]] || "text") + "; charset=utf-8";
-			/** 设定返回文档的MIME类型
-			 * @var {Response} fileRes */
 			let fileRes = { 
-				body: file, 
-				headers: new Headers({
-					"Content-Type": type
-				})
+				body: file,
+				status:200
 			};
-
-			return req.respond(fileRes);
-		}
-	).catch(
+			return Promise.resolve(fileRes);
+		},
 		(err) => {
 			let errRes = { body: "" };//config.errPage
 			switch (err.name) {
@@ -108,7 +101,17 @@ function staticRespond(req) {
 					errRes.status = 500;
 					logGeneralError(err);
 			}
-			return req.respond(errRes);
+			return Promise.resolve(errRes);
 		}
-	);
+	).then(
+		/** 设定返回文档的MIME类型
+		 * @param {Response} res */
+		(res) => {
+			let type = (config.mineType[req.url.match(/\.([^.]*)$/)[1]] || "text") + "; charset=utf-8";
+			res.headers = new Headers({
+				"Content-Type": type
+			});
+			return req.respond(res);
+		}
+	).catch(logGeneralError);
 }

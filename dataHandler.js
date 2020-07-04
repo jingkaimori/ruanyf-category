@@ -24,7 +24,7 @@ function parser(data, issueNum) {
 	let num = 0;
 	let res = [];
 	let tag = "";
-	let lines = data.split(/\n{2,}/);
+	let lines = data.split(/\n\s*\n/);
 	function Item() {
 		num++;
 		this.content = [];
@@ -32,9 +32,11 @@ function parser(data, issueNum) {
 		this.issueNum = issueNum;
 		this.id = issueNum + "-" + num;
 	}
-	Item.prototype.push = function () {
-		this.tag = tag;
-		res.push(this);
+	res.additem = function (item) {
+		item.tag = tag;
+		item.markdown = item.content.join("\n\n");
+		delete item.content;
+		res.push(item);
 	};
 	let item = new Item();
 
@@ -44,7 +46,7 @@ function parser(data, issueNum) {
 		let curline = lines[i];
 		if (curline.match(titleLeader)) {
 			if (!istitle) {
-				item.push();
+				res.additem(item);
 			}
 			item = new Item();
 			let tagline = curline.match(/^#+ (.+)$/);
