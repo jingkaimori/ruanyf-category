@@ -3,7 +3,7 @@
  * 此程序将会在本地建立一个服务器，提供用户界面来检索result.json
  * 此程序为整个程序的入口点。
  */
-import { readFileStr, exists } from "https://deno.land/x/std/fs/mod.ts";
+import { exists } from "https://deno.land/x/std/fs/mod.ts";
 import { join } from "https://deno.land/x/std/path/mod.ts";
 import { ServerRequest, serve } from "https://deno.land/x/std/http/mod.ts";
 import { readConfig, config } from "./configManager.js";
@@ -74,7 +74,7 @@ function staticRespond(req) {
 	exists(fileName).then(
 		(isExist) => {
 			if (isExist) {
-				return readFileStr(fileName);
+				return Deno.readFile(fileName);
 			} else {
 				let status = new Error("file not found");
 				status.name = "NotFound";
@@ -107,7 +107,7 @@ function staticRespond(req) {
 		/** 设定返回文档的MIME类型
 		 * @param {Response} res */
 		(res) => {
-			let type = (config.mineType[req.url.match(/\.([^.]*)$/)[1]] || "text") + "; charset=utf-8";
+			let type = (config.mineType[req.url.match(/\.([^.]*)$/)[1]] || "text");
 			res.headers = new Headers({
 				"Content-Type": type
 			});

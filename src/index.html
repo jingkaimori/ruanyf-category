@@ -4,22 +4,25 @@
     <meta charset="utf-8">
     <meta content="">
     <link type="text/css" rel="stylesheet" href="/src/main.css">
+    <!-- 此页面为所有页面的框架，其余内容由脚本动态抓取。 -->
   </head>
   <body>
     <header>
-      <!-- 请勿修改此字段！此字段将被header.html替换 -->
+      <button class="header-button" id="indexPage">首页</button>
+      <button class="header-button" id="viewPage">查看条目</button>
+      <button class="header-button" id="editPage">编辑</button>
+      <button class="header-button" id="searchPage">搜索</button>
+      <!-- <a class="header-button" href="/src/about.html">关于</a> -->
     </header>
     <div class="content">
       <div class="sidebar">
       </div>
-      <main role="main">
-        <p>这个项目将<a href="https://github.com/ruanyf/weekly">阮一峰老师的每周新闻</a>格式化为json格式，并提取了项目的元数据，提取了每一条项目的关键字</p>
-        <p>这个项目位于<a href="https://github.com/jingkaimori/ruanyf-category">jingkaimori/ruanyf-category</a></p>
-        <p>这个项目由阮一峰创作的部分采用<a href="https://creativecommons.org/licenses/by-nc-nd/3.0/deed.zh">CC-BY_NC_ND 4.0协议</a>授权，其余部分采用<a href="https://www.mozilla.org/en-US/MPL/2.0/">MPLv2.0协议</a>授权</p>
-      </main>
+      <main role="main"><!-- 请勿修改此字段！此字段将根据页面状态动态生成。 --></main>
       <div class="sidebar">
       </div>
     </div>
+    <!-- 导入外部库，由于该库不支持export导出，所以在此进行导入 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="/src/main.js"></script>
   </body>
 </html>
