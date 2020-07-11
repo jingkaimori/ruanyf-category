@@ -42,3 +42,19 @@ export function debugOutput(mesg) {
 		console.log(mesg);
 	}
 }
+export function getUrlParam(url){
+	let domainPattern = /^(?<schema>\w*):\/\/(?<domain>[0-9A-Za-z.-]+)?(:(?<port>[0-9]+))?(?<path>\/[0-9a-zA-Z%+-~._\/]*)(\?(?<params>.*))?$/;
+	let domainRes=domainPattern.exec(url);
+	let res =  domainRes.groups;
+	res.query = {};
+	let paramPattern = /&?(?<name>[0-9a-zA-Z%+-~._]+)=(?<value>[0-9a-zA-Z%+-~._]*)/y;
+	let paramRes = paramPattern.exec(res.params);
+	while(paramRes){
+		let name = decodeURIComponent(paramRes.groups.name);
+		let value = decodeURIComponent(paramRes.groups.value);
+		res.query[name]=value;
+		paramRes = paramPattern.exec(res.params);
+	}
+	delete res.params;
+	return res;
+}
