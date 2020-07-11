@@ -12,9 +12,9 @@ header{
 	float: left;
 }
 
-.content{
+.page-wrapper{
 	display: block;
-/*  	display: flex;
+/*	display: flex;
 	flex-direction: row; 
 	align-content: center; */
 }

@@ -14,7 +14,16 @@
       <button class="header-button" id="searchPage">搜索</button>
       <!-- <a class="header-button" href="/src/about.html">关于</a> -->
     </header>
-    <div class="content">
+    <template id="articleTemplate">
+      <article id="conponent">
+        <h1 id="contentTitle"></h1>
+        <div id="content"></div>
+        <div class="article-bottom" id="contentBottom">
+          <a href="" id="resourceLink"></a>
+        </div>
+      </article>
+    </template>
+    <div class="page-wrapper">
       <div class="sidebar">
       </div>
       <main role="main"><!-- 请勿修改此字段！此字段将根据页面状态动态生成。 --></main>
