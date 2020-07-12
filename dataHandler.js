@@ -11,13 +11,18 @@ import { readFileStr,readJson, writeJson, walk } from "https://deno.land/x/std/f
 import { join } from "https://deno.land/x/std/path/mod.ts";
 import { readConfig, config } from "./configManager.js";
 import {logFileWriteError,logFileReadError,debugOutput} from "./utility.js";
-
-export var structure=[];
+/**
+ * @property {Array<Object>} index
+ */
+export var structure={
+	index:[],
+	data:[]
+};
 
 /**
  * 将给定的期刊文本拆分为条目。
  * @param {String} data 期刊的markdown格式文本
- * @returns {object}
+ * @returns {Array<Object>}
  */
 function parser(data, issueNum) {
 	data = data.replace(/<br>/img, '\n');
@@ -26,7 +31,6 @@ function parser(data, issueNum) {
 	let tag = "";
 	let lines = data.split(/\n\s*\n/);
 	function Item() {
-		num++;
 		this.content = [];
 		this.images = [];
 		this.issueNum = issueNum;
@@ -37,6 +41,7 @@ function parser(data, issueNum) {
 		item.markdown = item.content.join("\n\n");
 		delete item.content;
 		res.push(item);
+		num++;
 	};
 	let item = new Item();
 
@@ -47,8 +52,8 @@ function parser(data, issueNum) {
 		if (curline.match(titleLeader)) {
 			if (!istitle) {
 				res.additem(item);
+				item = new Item();
 			}
-			item = new Item();
 			let tagline = curline.match(/^#+ (.+)$/);
 			if (tagline) {
 				tag = tagline[1];
@@ -94,6 +99,7 @@ function parser(data, issueNum) {
 			item.content.push(curline);
 		}
 	}
+	res.additem = undefined;
 	return res;
 }
 /**
@@ -101,10 +107,7 @@ function parser(data, issueNum) {
  * @returns {Promise} 
  */
 export async function updateFromLocalIssues() {
-	debugOutput("Started!");
-	let res = [];
-	//debugOutput('***' + JSON.stringify(config));
-
+	//debugOutput("Started!");
 	/* 使用walk函数来遍历目录，检索期刊文章。
 	 * 此处使用数组来收集所有的回调函数，并使用Promise来检查所有的异步操作是否都完成。
 	 */ 
@@ -116,9 +119,15 @@ export async function updateFromLocalIssues() {
 	//读完所有文件后保存数据结构
 	return writeStructure();
 }
+/* function postProcess(){
+	structure.data.sort((a,b)=>{
+		return a.
+	})
+} */
 /**
  * 从给定的文件路径读取并处理本地期刊。
  * @param {String} path 期刊的文件路径
+ * @returns {Promise<void>}
  */
 export async function readLocalIssue(path) {
 	//debugOutput("ping!");
@@ -127,7 +136,7 @@ export async function readLocalIssue(path) {
 		(data)=>{
 			let pRes = parser(data, parseInt(issueNum));
 
-			structure = structure.concat(pRes);
+			structure.data = structure.data.concat(pRes);
 		}
 	).catch( logFileWriteError );
 	

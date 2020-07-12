@@ -8,7 +8,7 @@ import { join } from "https://deno.land/x/std/path/mod.ts";
 import { ServerRequest, serve } from "https://deno.land/x/std/http/mod.ts";
 import { readConfig, config } from "./configManager.js";
 import { readStructure, structure, updateFromLocalIssues } from "./dataHandler.js";
-import { debugOutput, logGeneralError } from "./utility.js";
+import { debugOutput, logGeneralError ,getUrlParam } from "./utility.js";
 /** 
  * 搭建http服务器处理动态请求。
  * deno使用异步迭代器（而非事件机制）响应网络请求。
@@ -42,12 +42,13 @@ async function main() {
  * @param {ServerRequest} req 
  */
 function dynamicRespond(req) {
-	if (/^\/load/.test(req.url)) {
-		let item = req.url.match(/^\/load\/(.*)\??/)[1];
+	let params = getUrlParam(req.url);
+	if (/^\/load/.test(params.path)) {
+		let item = params.path.match(/^\/load\/(.*)/)[1];
 		//req.headers.get();
 		Deno.readAll(req.body).then(
 			(data) => {
-				let itemContent = "", itemObject = structure.find((ele) => { return ele.id == item; });
+				let itemContent = "", itemObject = structure.data.find((ele) => { return ele.id == item; });
 				if (itemObject) {
 					itemContent = JSON.stringify(itemObject);
 				} else {
