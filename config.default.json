@@ -73,7 +73,7 @@
 			"match": "!\\[.*\\]\\((.*)\\)",
 			"type": "list",
 			"list": "images",
-			"remove": true,
+			"remove": false,
 			"title": false
 		}
 	]

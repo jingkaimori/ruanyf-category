@@ -42,8 +42,13 @@ export function debugOutput(mesg) {
 		console.log(mesg);
 	}
 }
+/**
+ * 分解URL的各个部分
+ * @param {string} url 
+ * @returns {Object}
+ */
 export function getUrlParam(url){
-	let domainPattern = /^(?<schema>\w*):\/\/(?<domain>[0-9A-Za-z.-]+)?(:(?<port>[0-9]+))?(?<path>\/[0-9a-zA-Z%+-~._\/]*)(\?(?<params>.*))?$/;
+	let domainPattern = /^((?<schema>\w*):\/\/)?(?<domain>[0-9A-Za-z.-]+)?(:(?<port>[0-9]+))?(?<path>\/[0-9a-zA-Z%+-~._\/]*)(\?(?<params>.*))?$/;
 	let domainRes=domainPattern.exec(url);
 	let res =  domainRes.groups;
 	res.query = {};

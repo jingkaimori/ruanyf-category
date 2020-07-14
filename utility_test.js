@@ -32,4 +32,16 @@ Deno.test("getURLParam", () => {
 				"q": "is:issue+is:open"
 			}
 		});
+	assertEquals(
+		utility.getUrlParam("/denoland/deno/issues?page=20&q=is%3Aissue+is%3Aopen"),
+		{
+			"schema": undefined,
+			"domain": undefined,
+			"port": undefined,
+			"path": "/denoland/deno/issues",
+			"query": {
+				"page": "20",
+				"q": "is:issue+is:open"
+			}
+		});
 });

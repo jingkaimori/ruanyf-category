@@ -42,29 +42,42 @@ async function main() {
  * @param {ServerRequest} req 
  */
 function dynamicRespond(req) {
-	let params = getUrlParam(req.url);
-	if (/^\/load/.test(params.path)) {
-		let item = params.path.match(/^\/load\/(.*)/)[1];
-		//req.headers.get();
-		Deno.readAll(req.body).then(
-			(data) => {
-				let itemContent = "", itemObject = structure.data.find((ele) => { return ele.id == item; });
+	Deno.readAll(req.body).then(
+		(data) => {
+			let params = getUrlParam(req.url);
+			let itemContent = "";
+			let status = 200;
+			if (/^\/load/.test(params.path)) {
+				let item = params.path.match(/^\/load\/(.*)/)[1];
+				//req.headers.get();
+				let itemObject = structure.data.find((ele) => { return ele.id == item; });
 				if (itemObject) {
 					itemContent = JSON.stringify(itemObject);
 				} else {
-					itemContent = item;
+					status = 404;
 				}
-				/** @var {Response} res */
+			}else if(params.path=="/list"){
+				let start = params.query.start;
+				let length = params.query.length;
 				let res = {
-					body: itemContent,
-					headers : new Headers({
-						"Content-Type": "application/json;charset=utf-8"
-					})
+					start:start,
+					length:length,
+					data:structure.data.slice(start,start + length)
 				};
-				return req.respond(res);
+				itemContent = JSON.stringify(res);
+			}else{
+				status = 404;
 			}
-		);
-	}
+			/** @var {Response} res */
+			let res = {
+				body: itemContent,
+				headers : new Headers({
+					"Content-Type": "application/json;charset=utf-8"
+				})
+			};
+			return req.respond(res);
+		}
+	);
 }
 /**
  * 静态服务器响应函数，可由nginx配置文件代替

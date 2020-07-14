@@ -34,7 +34,7 @@ function parser(data, issueNum) {
 		this.content = [];
 		this.images = [];
 		this.issueNum = issueNum;
-		this.id = issueNum + "-" + num;
+		this.seq = num;
 	}
 	res.additem = function (item) {
 		item.tag = tag;
@@ -80,11 +80,6 @@ function parser(data, issueNum) {
 						}
 						break;
 					case "list":
-						/* console.log("debug begin:\n\t"+
-							item[currule.list] + "\n\t" +
-							item[currule.list].concat(arg.slice(1)) +"\n" +
-							"debug end"
-						); */
 						item[currule.list] =
 							item[currule.list].concat(arg.slice(1));
 						break;
@@ -99,7 +94,7 @@ function parser(data, issueNum) {
 			item.content.push(curline);
 		}
 	}
-	res.additem = undefined;
+	delete res.additem;
 	return res;
 }
 /**
@@ -116,14 +111,23 @@ export async function updateFromLocalIssues() {
 		work.push(readLocalIssue(entry.path).catch( logFileWriteError ));
 	}
 	await Promise.allSettled(work);
+	postProcess();
 	//读完所有文件后保存数据结构
 	return writeStructure();
 }
-/* function postProcess(){
+function postProcess(){
 	structure.data.sort((a,b)=>{
-		return a.
-	})
-} */
+		if(a.issueNum != b.issueNum){
+			return a.issueNum - b.issueNum;
+		}else{
+			return a.seq - b.seq;
+		}
+	});
+	structure.data.forEach(function(value,idx){
+		value.id = idx;
+		delete value.seq;
+	});
+}
 /**
  * 从给定的文件路径读取并处理本地期刊。
  * @param {String} path 期刊的文件路径
